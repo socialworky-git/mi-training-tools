@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MI + SBIRT Training Day Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --mi-bg: #e8f0fb; --mi-border: #b5ccf5; --mi-accent: #2563c7; --mi-text: #1a3a7a;
+    --sb-bg: #e5f5ee; --sb-border: #a8dfc0; --sb-accent: #1a7a4a; --sb-text: #0f4a2c;
+    --good: #1a7a4a; --warn: #b25a00; --danger: #b02020; --neutral: #5a5a6a;
+    --bg: #f4f3f0; --surface: #ffffff; --text: #1a1a2e; --text-muted: #6a6a7e;
+    --border: #e0deda; --radius: 8px;
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+  header {
+    background: #1a1a2e; color: #f4f3f0; padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  header h1 { font-family: var(--mono); font-size: 16px; font-weight: 500; letter-spacing: 0.04em; opacity: 0.9; }
+  header .date-display { font-family: var(--mono); font-size: 13px; opacity: 0.6; letter-spacing: 0.03em; }
+  .clock-strip {
+    background: #1a1a2e; border-top: 1px solid rgba(255,255,255,0.08);
+    display: grid; grid-template-columns: repeat(4, 1fr); padding: 0 32px 16px; gap: 12px;
+  }
+  .clock-card { background: rgba(255,255,255,0.06); border-radius: var(--radius); padding: 10px 14px; border: 1px solid rgba(255,255,255,0.1); }
+  .clock-card .lbl { font-size: 10px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+  .clock-card .val { font-family: var(--mono); font-size: 18px; font-weight: 500; color: #f4f3f0; letter-spacing: 0.02em; }
+  .clock-card .val.good { color: #5dca8a; }
+  .clock-card .val.warn { color: #f5a623; }
+  .clock-card .val.danger { color: #f05050; }
+  .clock-card .val.muted { color: rgba(255,255,255,0.45); }
+  .main { max-width: 820px; margin: 0 auto; padding: 24px 20px 40px; }
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .legend span { font-size: 11px; font-family: var(--mono); letter-spacing: 0.04em; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+  .badge-didactic     { background: #e8f0fb; color: #2563c7; border-color: #b5ccf5; }
+  .badge-activity     { background: #e5f5ee; color: #1a7a4a; border-color: #a8dfc0; }
+  .badge-demo         { background: #fef3e2; color: #b25a00; border-color: #f5c97a; }
+  .badge-debrief      { background: #f0eafd; color: #6030c0; border-color: #c8b0f5; }
+  .session-block { margin-bottom: 28px; }
+  .session-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: var(--radius) var(--radius) 0 0;
+    border: 1px solid; border-bottom: none; flex-wrap: wrap; gap: 8px;
+  }
+  .mi-head    { background: var(--mi-bg); border-color: var(--mi-border); }
+  .sbirt-head { background: var(--sb-bg); border-color: var(--sb-border); }
+  .session-head .s-title { font-size: 14px; font-weight: 600; color: var(--mi-text); }
+  .sbirt-head .s-title   { color: var(--sb-text); }
+  .session-head .s-meta  { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .session-head .s-status { font-family: var(--mono); font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid; font-weight: 500; }
+  .status-upcoming { background: #f0f0f5; color: #6a6a7e; border-color: #d0d0da; }
+  .status-active   { background: #fff8e0; color: #b25a00; border-color: #f5c97a; }
+  .status-done     { background: #e5f5ee; color: #1a7a4a; border-color: #a8dfc0; }
+  .items-wrap { border: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); background: var(--surface); overflow: hidden; }
+  .item-row {
+    display: grid; grid-template-columns: 28px 1fr auto;
+    align-items: center; gap: 10px; padding: 9px 14px;
+    border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-row.done    { background: #f9f9f7; opacity: 0.5; }
+  .item-row.active  { background: #fffbe8; border-left: 3px solid #f5a623; }
+  .item-row.overdue { border-left: 3px solid #f05050; }
+  input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--mi-accent); }
+  .item-label { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .item-label .type-badge {
+    display: inline-block; font-size: 10px; font-family: var(--mono);
+    padding: 1px 7px; border-radius: 10px; margin-left: 6px; vertical-align: middle; border: 1px solid;
+  }
+  .item-times { text-align: right; font-family: var(--mono); font-size: 11px; color: var(--text-muted); line-height: 1.7; white-space: nowrap; }
+  .item-times .t-start { font-size: 12px; font-weight: 500; color: var(--text); }
+  .break-bar {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #f4f3f0; border: 1px dashed #c8c7c2; border-radius: var(--radius);
+    padding: 12px; margin: 16px 0; font-family: var(--mono); font-size: 12px;
+    color: var(--text-muted); letter-spacing: 0.03em;
+  }
+  .section-lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; padding-left: 2px; }
+  .progress-bar-wrap { height: 3px; background: var(--border); border-radius: 2px; margin: 6px 0 14px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+  .mi-fill { background: var(--mi-accent); }
+  .sb-fill { background: var(--sb-accent); }
+  .note-badge { font-size: 10px; font-family: var(--mono); color: var(--text-muted); font-style: italic; margin-left: 4px; }
+  @media (max-width: 600px) {
+    .clock-strip { grid-template-columns: 1fr 1fr; padding: 0 16px 16px; }
+    header { padding: 14px 16px; }
+    .main { padding: 16px 12px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MI + SBIRT Training Day &mdash; OSU</h1>
+  <span class="date-display" id="dateDisplay"></span>
+</header>
+
+<div class="clock-strip">
+  <div class="clock-card"><div class="lbl">Current time</div><div class="val" id="clockNow">--:--</div></div>
+  <div class="clock-card"><div class="lbl">Active session</div><div class="val muted" id="clockSession">--</div></div>
+  <div class="clock-card"><div class="lbl">Session ends</div><div class="val muted" id="clockEnd">--</div></div>
+  <div class="clock-card"><div class="lbl">Schedule status</div><div class="val muted" id="clockStatus">--</div></div>
+</div>
+
+<div class="main">
+
+  <div class="legend">
+    <span class="badge-didactic">didactic</span>
+    <span class="badge-activity">activity</span>
+    <span class="badge-demo">demo</span>
+    <span class="badge-debrief">debrief</span>
+  </div>
+
+  <div class="section-lbl">Morning &mdash; MI &middot; 9:00 AM &ndash; 12:00 PM</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill mi-fill" id="miBar" style="width:0%"></div></div>
+  <div class="session-block">
+    <div class="session-head mi-head">
+      <span class="s-title">Motivational Interviewing</span>
+      <span class="s-meta">9:00 &ndash; 12:00 PM &middot; 215 min scheduled / 180 min available</span>
+      <span class="s-status status-upcoming" id="miStatus">Upcoming</span>
+    </div>
+    <div class="items-wrap" id="miItems"></div>
+  </div>
+
+  <div class="break-bar">&#9749; Lunch break &nbsp;&middot;&nbsp; 12:00 PM &ndash; 1:30 PM &nbsp;&middot;&nbsp; 90 minutes</div>
+
+  <div class="section-lbl">Afternoon &mdash; SBIRT &middot; 1:30 PM &ndash; 3:30 PM</div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill sb-fill" id="sbBar" style="width:0%"></div></div>
+  <div class="session-block">
+    <div class="session-head sbirt-head">
+      <span class="s-title">SBIRT</span>
+      <span class="s-meta">1:30 &ndash; 3:30 PM &middot; 122 min scheduled / 120 min available</span>
+      <span class="s-status status-upcoming" id="sbirtStatus">Upcoming</span>
+    </div>
+    <div class="items-wrap" id="sbirtItems"></div>
+  </div>
+
+</div>
+
+<script>
+const MI_START_MINS = 9 * 60;
+const MI_END_MINS   = 12 * 60;
+const SB_START_MINS = 13 * 60 + 30;
+const SB_END_MINS   = 15 * 60 + 30;
+
+const miAgenda = [
+  { label: "Intro / agenda / setting stage",         mins: 10, type: "didactic" },
+  { label: "Directing change",                        mins: 10, type: "activity" },
+  { label: "Fixing reflect",                          mins:  5, type: "didactic" },
+  { label: "Guiding change",                          mins: 10, type: "activity" },
+  { label: "Ambivalence lecture",                     mins: 15, type: "didactic" },
+  { label: "Spirit of MI lecture",                    mins: 10, type: "didactic" },
+  { label: "Intro to OARS lecture",                   mins: 10, type: "didactic" },
+  { label: "Reflective state of mind",                mins: 15, type: "activity" },
+  { label: "Reflections lecture",                     mins:  5, type: "didactic" },
+  { label: "Forming reflections",                     mins: 15, type: "activity" },
+  { label: "Affirmations lecture",                    mins: 10, type: "didactic" },
+  { label: "Mining for affirmations",                 mins: 10, type: "activity" },
+  { label: "The importance of empathy lecture",       mins: 10, type: "didactic" },
+  { label: "Video of engagement and reflections",     mins:  5, type: "demo" },
+  { label: "Sustaining reflections",                  mins: 15, type: "activity" },
+  { label: "4 tasks of MI: engagement and focusing",  mins: 15, type: "didactic" },
+  { label: "Evocation lecture",                       mins:  5, type: "didactic" },
+  { label: "Video demos",                             mins: 10, type: "demo" },
+  { label: "Evocation lecture continued",             mins: 20, type: "didactic" },
+];
+
+const sbirtAgenda = [
+  { label: "Intro to SBIRT lecture",                  mins: 20, type: "didactic" },
+  { label: "Responding to reluctance",                mins: 15, type: "activity" },
+  { label: "Overview of ASSIST lecture",              mins: 15, type: "didactic" },
+  { label: "Practicing ASSIST",                       mins: 10, type: "activity" },
+  { label: "SBIRT engagement and demo",               mins:  5, type: "demo" },
+  { label: "SBIRT focusing",                          mins:  5, type: "didactic" },
+  { label: "Role play: giving info with neutrality",  mins: 10, type: "activity" },
+  { label: "Evoking lecture",                         mins:  5, type: "didactic" },
+  { label: "Intentional reflections",                 mins: 10, type: "activity" },
+  { label: "Planning lecture and demo",               mins: 10, type: "demo" },
+  { label: "Rule for thought",                        mins: 10, type: "activity" },
+  { label: "Planning video demo",                     mins:  7, type: "demo" },
+  { label: "SBIRT Andi AI demo", mins: 0, type: "demo", note: "async / self-paced after training" },
+];
+
+const typeMap = {
+  didactic: 'badge-didactic',
+  activity: 'badge-activity',
+  demo:     'badge-demo',
+  debrief:  'badge-debrief',
+};
+
+const state = {
+  mi: miAgenda.map(() => ({ checked: false })),
+  sb: sbirtAgenda.map(() => ({ checked: false })),
+};
+
+function getNowMins() {
+  const n = new Date();
+  return n.getHours() * 60 + n.getMinutes();
+}
+
+function fmtTime(totalMins) {
+  const h = Math.floor(totalMins / 60) % 24;
+  const m = totalMins % 60;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 || 12;
+  return hh + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+}
+
+function buildSchedule(agenda, startMins) {
+  let cursor = startMins;
+  return agenda.map(it => {
+    const s = cursor;
+    cursor += it.mins;
+    return { ...it, schedStart: s, schedEnd: cursor };
+  });
+}
+
+function renderSession(agenda, startMins, containerId, sessionKey) {
+  const scheduled = buildSchedule(agenda, startMins);
+  const nowMins = getNowMins();
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  scheduled.forEach((it, i) => {
+    const st = state[sessionKey][i];
+    const isZero    = it.mins === 0;
+    const isActive  = !st.checked && !isZero && nowMins >= it.schedStart && nowMins < it.schedEnd;
+    const isOverdue = !st.checked && !isZero && nowMins > it.schedEnd;
+
+    const row = document.createElement('div');
+    row.className = 'item-row'
+      + (st.checked  ? ' done'    : '')
+      + (isActive    ? ' active'  : '')
+      + (isOverdue   ? ' overdue' : '');
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = st.checked;
+    cb.addEventListener('change', () => {
+      state[sessionKey][i].checked = cb.checked;
+      renderAll();
+    });
+
+    const lbl = document.createElement('div');
+    lbl.className = 'item-label';
+    lbl.innerHTML = it.label
+      + ' <span class="type-badge ' + typeMap[it.type] + '">' + it.type + '</span>'
+      + (it.note ? '<span class="note-badge">(' + it.note + ')</span>' : '');
+
+    const times = document.createElement('div');
+    times.className = 'item-times';
+    if (isZero) {
+      times.innerHTML = '<span class="t-start">async</span><br>0 min';
+    } else {
+      times.innerHTML = '<span class="t-start">' + fmtTime(it.schedStart) + '</span><br>' + it.mins + ' min';
+    }
+
+    row.appendChild(cb);
+    row.appendChild(lbl);
+    row.appendChild(times);
+    container.appendChild(row);
+  });
+}
+
+function getScheduleOffset(agenda, startMins, sessionKey) {
+  const scheduled = buildSchedule(agenda, startMins);
+  const nowMins = getNowMins();
+  let lastCheckedIdx = -1;
+  for (let i = 0; i < agenda.length; i++) {
+    if (state[sessionKey][i].checked && agenda[i].mins > 0) lastCheckedIdx = i;
+  }
+  if (lastCheckedIdx < 0) return null;
+  const expectedEnd = scheduled[lastCheckedIdx].schedEnd;
+  return expectedEnd - nowMins;
+}
+
+function getProgress(sessionKey, total) {
+  const checked = state[sessionKey].filter(s => s.checked).length;
+  return Math.round((checked / total) * 100);
+}
+
+function renderAll() {
+  renderSession(miAgenda,    MI_START_MINS, 'miItems',    'mi');
+  renderSession(sbirtAgenda, SB_START_MINS, 'sbirtItems', 'sb');
+
+  document.getElementById('miBar').style.width = getProgress('mi', miAgenda.length) + '%';
+  document.getElementById('sbBar').style.width = getProgress('sb', sbirtAgenda.length) + '%';
+
+  const nowMins = getNowMins();
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 || 12;
+  document.getElementById('clockNow').textContent = hh + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+
+  const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('dateDisplay').textContent =
+    days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+
+  const inMI    = nowMins >= MI_START_MINS && nowMins < MI_END_MINS;
+  const inBreak = nowMins >= MI_END_MINS   && nowMins < SB_START_MINS;
+  const inSB    = nowMins >= SB_START_MINS && nowMins < SB_END_MINS;
+  const before  = nowMins < MI_START_MINS;
+  const after   = nowMins >= SB_END_MINS;
+
+  const sessionEl = document.getElementById('clockSession');
+  const endEl     = document.getElementById('clockEnd');
+
+  if (before)       { sessionEl.textContent = 'Pre-training';  sessionEl.className = 'val muted'; endEl.textContent = '9:00 AM'; }
+  else if (inMI)    { sessionEl.textContent = 'MI';            sessionEl.className = 'val';       endEl.textContent = '12:00 PM'; }
+  else if (inBreak) { sessionEl.textContent = 'Lunch break';   sessionEl.className = 'val muted'; endEl.textContent = '1:30 PM'; }
+  else if (inSB)    { sessionEl.textContent = 'SBIRT';         sessionEl.className = 'val';       endEl.textContent = '3:30 PM'; }
+  else if (after)   { sessionEl.textContent = 'Finished';      sessionEl.className = 'val good';  endEl.textContent = '--'; }
+
+  let diff = null;
+  if (inMI)  diff = getScheduleOffset(miAgenda,    MI_START_MINS, 'mi');
+  if (inSB)  diff = getScheduleOffset(sbirtAgenda, SB_START_MINS, 'sb');
+
+  const statusEl = document.getElementById('clockStatus');
+  if (diff === null) {
+    statusEl.textContent = (inMI || inSB) ? 'Check items off' : '--';
+    statusEl.className = 'val muted';
+  } else if (diff > 2) {
+    statusEl.textContent = '+' + diff + ' min ahead';
+    statusEl.className = 'val good';
+  } else if (diff < -2) {
+    statusEl.textContent = Math.abs(diff) + ' min behind';
+    statusEl.className = 'val danger';
+  } else {
+    statusEl.textContent = 'On time';
+    statusEl.className = 'val good';
+  }
+
+  const miStatusEl = document.getElementById('miStatus');
+  if (before)    { miStatusEl.textContent = 'Upcoming';    miStatusEl.className = 's-status status-upcoming'; }
+  else if (inMI) { miStatusEl.textContent = 'In progress'; miStatusEl.className = 's-status status-active'; }
+  else           { miStatusEl.textContent = 'Done';        miStatusEl.className = 's-status status-done'; }
+
+  const sbStatusEl = document.getElementById('sbirtStatus');
+  if (before || inMI || inBreak) { sbStatusEl.textContent = 'Upcoming';    sbStatusEl.className = 's-status status-upcoming'; }
+  else if (inSB)                 { sbStatusEl.textContent = 'In progress'; sbStatusEl.className = 's-status status-active'; }
+  else if (after)                { sbStatusEl.textContent = 'Done';        sbStatusEl.className = 's-status status-done'; }
+}
+
+renderAll();
+setInterval(renderAll, 20000);
+</script>
+</body>
+</html>
