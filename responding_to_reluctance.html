@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responding to Reluctance — MI Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --text-secondary: #6b7280;
+    --text-faint: #9ca3af;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --blue-border: #bfdbfe;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --green-border: #bbf7d0;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --amber-border: #fde68a;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --purple-border: #ddd6fe;
+    --slate: #475569;
+    --slate-light: #f8fafc;
+    --slate-border: #e2e8f0;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  /* TOPBAR */
+  .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 24px; height: 48px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .back-link { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 6px 10px; border-radius: 6px; transition: background 0.15s, color 0.15s; }
+  .back-link:hover { background: var(--border-light); color: var(--text); }
+  .topbar-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+  /* PAGE */
+  .page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* HERO */
+  .hero-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
+  .hero-img-inner {
+    width: 100%; height: 180px;
+    background: linear-gradient(135deg, rgba(30,58,95,0.95) 0%, rgba(109,40,217,0.85) 100%),
+      repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 40px);
+    display: flex; align-items: flex-end; padding: 24px 32px;
+  }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.9); }
+  .hero-body { padding: 28px 32px 32px; }
+  .hero-body h1 { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.02em; line-height: 1.25; }
+  .hero-body .desc { font-size: 15px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 20px; }
+
+  /* CALLOUT */
+  .callout { border-radius: var(--radius-sm); padding: 14px 18px; font-size: 14px; line-height: 1.6; border: 1px solid; }
+  .callout + .callout { margin-top: 10px; }
+  .callout-amber { background: var(--amber-light); border-color: var(--amber-border); color: #92400e; }
+  .callout-blue { background: var(--blue-light); border-color: var(--blue-border); color: #1e40af; }
+  .callout strong { font-weight: 600; }
+
+  /* CLIENT STATEMENT */
+  .statement-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 24px; overflow: hidden; }
+  .statement-head { padding: 16px 28px 0; display: flex; align-items: center; gap: 10px; }
+  .statement-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--slate-light); border: 1px solid var(--slate-border); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: var(--slate); letter-spacing: 0.03em; text-transform: uppercase; }
+  .statement-body { padding: 16px 28px 28px; }
+  .statement-quote {
+    background: var(--border-light);
+    border-left: 3px solid var(--slate);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 18px 20px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    font-style: italic;
+  }
+  .statement-quote .speaker { display: block; font-size: 12px; font-weight: 600; color: var(--slate); font-style: normal; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  /* RESPONSE CARDS */
+  .responses-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+  .responses-header h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .responses-header .sub { font-size: 13px; color: var(--text-faint); }
+
+  .response-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border); transition: border-color 0.2s; }
+  .response-card:focus-within { border-color: #93c5fd; }
+
+  .response-head { display: flex; align-items: center; gap: 12px; padding: 14px 20px 12px; border-bottom: 1px solid var(--border-light); }
+  .response-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .response-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .response-hint { font-size: 12px; color: var(--text-faint); margin-left: auto; font-style: italic; }
+
+  .response-body { padding: 14px 20px; }
+  .response-textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; font-family: var(--font); font-size: 14px; color: var(--text);
+    background: var(--border-light); outline: none; resize: vertical; min-height: 72px;
+    line-height: 1.6; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .response-textarea:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: #fff; }
+  .response-textarea::placeholder { color: var(--text-faint); }
+
+  /* EXAMPLE TOGGLE */
+  .example-toggle { display: flex; align-items: center; gap: 6px; margin-top: 10px; background: none; border: none; font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--text-faint); cursor: pointer; padding: 4px 0; transition: color 0.15s; }
+  .example-toggle:hover { color: var(--blue); }
+  .example-toggle svg { transition: transform 0.2s; }
+  .example-toggle.open svg { transform: rotate(90deg); }
+  .example-box { display: none; margin-top: 10px; background: var(--green-light); border: 1px solid var(--green-border); border-radius: 6px; padding: 12px 14px; font-size: 13px; color: #166534; line-height: 1.6; }
+  .example-box .ex-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green); margin-bottom: 6px; }
+
+  /* COLOR VARIANTS */
+  .num-1 { background: #eff6ff; color: #2563eb; }
+  .num-2 { background: #f0fdf4; color: #16a34a; }
+  .num-3 { background: #fff7ed; color: #ea580c; }
+  .num-4 { background: #f5f3ff; color: #7c3aed; }
+  .num-5 { background: #fdf2f8; color: #db2777; }
+  .num-6 { background: #f0fdfa; color: #0d9488; }
+
+  /* ACTIONS */
+  .actions-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .actions-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .actions-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid; transition: all 0.15s; }
+  .btn-ghost { background: transparent; border-color: var(--border); color: var(--text-secondary); }
+  .btn-ghost:hover { background: var(--border-light); color: var(--text); border-color: #d1d5db; }
+  .btn-primary { background: var(--text); border-color: var(--text); color: #fff; }
+  .btn-primary:hover { background: #374151; }
+  .btn-danger { background: transparent; border-color: var(--border); color: #ef4444; }
+  .btn-danger:hover { background: #fee2e2; border-color: #fca5a5; }
+
+  @media print {
+    .topbar, .actions-card, .example-toggle, .example-box { display: none !important; }
+    body { background: #fff; }
+    .page { padding: 24px; }
+    .response-card, .hero-card, .statement-card { box-shadow: none; }
+  }
+  @media (max-width: 600px) {
+    .page { padding: 24px 12px 60px; }
+    .hero-body, .statement-body, .statement-head { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-link" href="https://socialworky.craft.me/OSU" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    OSU Training Page
+  </a>
+  <span class="topbar-title">MI and SBIRT: Small Group Activities</span>
+  <div></div>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero-card">
+    <div class="hero-img-inner">
+      <span class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 4V6.5L7.5 8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Activity 7 · Responding to Reluctance
+      </span>
+    </div>
+    <div class="hero-body">
+      <h1>Responding to Reluctance</h1>
+      <p class="desc">In this activity we explore MI-adherent responses to a client who has concerns about completing a substance use screening. Work with your group to develop each of the six responses below.</p>
+      <div class="callout callout-amber">
+        <strong>Instructions:</strong> Read the client statement carefully as a group. Then work together to craft each of the six MI-adherent responses. Use the "Show example" toggle under each item to check your work after you've made your own attempt.
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT STATEMENT -->
+  <div class="statement-card">
+    <div class="statement-head">
+      <span class="statement-tag">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 3h8M2 6h6M2 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Client Statement
+      </span>
+    </div>
+    <div class="statement-body">
+      <div class="statement-quote">
+        <span class="speaker">Client</span>
+        "It's a little confusing to me why you're asking about drug use. It doesn't seem like this is relevant to the reason for my visit today. I do want to take care of my health, but the idea of discussing my drug use is making me a bit uncomfortable.
+        <br><br>
+        It's not that I don't trust you or the clinic, but it just doesn't feel like this is any of your business. I guess I worry that this information could get out there and that it might cause some sort of legal or social problems for me. I guess it makes some sense that you would need a complete picture of my health and that drugs are part of that. I'm just not sure that this screening is necessary."
+      </div>
+    </div>
+  </div>
+
+  <!-- RESPONSES -->
+  <div class="responses-header">
+    <h2>Your Group's Responses</h2>
+    <span class="sub">6 items</span>
+  </div>
+
+  <div id="responseCards"></div>
+
+  <!-- ACTIONS -->
+  <div class="actions-card">
+    <span class="actions-label">Save your work</span>
+    <div class="actions-btns">
+      <button class="btn btn-danger" onclick="clearAll()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2L11 11M11 2L2 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Clear
+      </button>
+      <button class="btn btn-ghost" onclick="window.print()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="4" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V2H9V4" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="4" y="9" width="5" height="3" rx="0.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Print
+      </button>
+      <button class="btn btn-ghost" onclick="downloadText()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2V9M4 7L6.5 9.5L9 7M2 11H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download
+      </button>
+      <button class="btn btn-primary" id="copyBtn" onclick="copyAll()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="7" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M2 9V2H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Copy to clipboard
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const items = [
+  {
+    title: "Simple Reflection",
+    hint: "Mirror the surface content",
+    placeholder: "Write a simple reflection of what the client said…",
+    example: "You're not sure this screening fits with what brought you in today.",
+    note: "A simple reflection restates or slightly rephrases what the client said, staying close to the surface. It communicates that you heard them without adding interpretation."
+  },
+  {
+    title: "Complex Reflection",
+    hint: "Go beneath the surface",
+    placeholder: "Write a complex reflection that names something deeper…",
+    example: "Part of you wants to take care of your health — and part of you is worried about what sharing this information might cost you.",
+    note: "A complex reflection adds meaning, names an emotion, or surfaces the ambivalence underneath. It goes beyond what was said to what might be meant."
+  },
+  {
+    title: "Emphasizing Confidentiality",
+    hint: "Address the privacy concern directly",
+    placeholder: "Write a response that addresses the client's confidentiality concerns…",
+    example: "What you share here stays here. There are legal protections around this kind of information, and I want you to understand exactly what those are before we go any further.",
+    note: "This response directly addresses the client's fear that information could cause legal or social harm. It should be honest, specific, and not dismissive of a legitimate concern."
+  },
+  {
+    title: "Seeking Collaboration",
+    hint: "Invite the client into the process",
+    placeholder: "Write a response that positions this as something you do together…",
+    example: "I'd rather we figure out together whether this makes sense for you than just run through it. What would you need to feel okay about this?",
+    note: "Collaboration in MI means treating the client as an equal partner. This response avoids the expert role and invites the client to help shape what happens next."
+  },
+  {
+    title: "Offering an Affirmation",
+    hint: "Reflect a genuine strength",
+    placeholder: "Write an affirmation grounded in something specific the client said…",
+    example: "Even with all these reservations, you're still here and willing to talk this through. That says something about how seriously you take your health.",
+    note: "An affirmation names a real strength, value, or effort visible in what the client said or did. Avoid generic praise — ground it in something specific from this client's words."
+  },
+  {
+    title: "Emphasizing Autonomy",
+    hint: "Name their right to choose",
+    placeholder: "Write a response that honors the client's right to decide…",
+    example: "Ultimately this is your call. I can tell you what the screening involves and what protections are in place, but whether you do it is completely up to you.",
+    note: "Autonomy support means explicitly acknowledging that the client has the right to decide. It reduces reactance and often paradoxically increases openness to continuing."
+  }
+];
+
+const colors = ['num-1','num-2','num-3','num-4','num-5','num-6'];
+
+function buildCards() {
+  const container = document.getElementById('responseCards');
+  items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'response-card';
+
+    card.innerHTML = `
+      <div class="response-head">
+        <div class="response-num ${colors[i]}">${i+1}</div>
+        <div class="response-title">${item.title}</div>
+        <span class="response-hint">${item.hint}</span>
+      </div>
+      <div class="response-body">
+        <textarea class="response-textarea" placeholder="${item.placeholder}" rows="3"></textarea>
+        <button class="example-toggle" data-idx="${i}">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2L8 6L4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Show example
+        </button>
+        <div class="example-box" id="ex-${i}">
+          <div class="ex-label">Example response</div>
+          <div style="margin-bottom:8px;font-style:italic;">"${item.example}"</div>
+          <div style="font-size:12px;color:#166534;opacity:0.85;">${item.note}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.querySelectorAll('.example-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.idx;
+      const box = document.getElementById('ex-' + idx);
+      const open = box.style.display === 'block';
+      box.style.display = open ? 'none' : 'block';
+      btn.classList.toggle('open', !open);
+      btn.querySelector('span') && (btn.querySelector('span').textContent = open ? 'Show example' : 'Hide example');
+      btn.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = open ? ' Show example' : ' Hide example'; });
+      // update text node
+      btn.lastChild.textContent = open ? ' Show example' : ' Hide example';
+    });
+  });
+}
+
+function getTextContent() {
+  const tas = document.querySelectorAll('.response-textarea');
+  let out = 'RESPONDING TO RELUCTANCE\nMI Training — OSU\n' + '='.repeat(38) + '\n\n';
+  out += 'CLIENT STATEMENT:\n"It\'s a little confusing to me why you\'re asking about drug use..."\n\n';
+  out += 'GROUP RESPONSES\n' + '-'.repeat(28) + '\n\n';
+  items.forEach((item, i) => {
+    const val = tas[i] ? tas[i].value.trim() : '';
+    out += (i+1) + '. ' + item.title + '\n' + (val || '[not yet written]') + '\n\n';
+  });
+  return out;
+}
+
+function clearAll() {
+  if (!confirm('Clear all responses?')) return;
+  document.querySelectorAll('.response-textarea').forEach(t => t.value = '');
+}
+
+function downloadText() {
+  const blob = new Blob([getTextContent()], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'responding-to-reluctance.txt'; a.click();
+}
+
+function copyAll() {
+  navigator.clipboard.writeText(getTextContent()).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="7" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M2 9V2H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Copy to clipboard'; }, 2000);
+  });
+}
+
+buildCards();
+</script>
+</body>
+</html>
