@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mining for Affirmations — MI Training Worksheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f7f4ef;
+    --warm-white: #fdfcfa;
+    --ink: #1c1a17;
+    --ink-light: #5a5650;
+    --ink-faint: #a09a92;
+    --gold: #c8973a;
+    --gold-light: #f5e9d0;
+    --gold-border: #e8d4a8;
+    --green: #3a7a52;
+    --green-light: #e8f3ec;
+    --green-border: #b0d8be;
+    --blue: #2e5fa3;
+    --blue-light: #e8eef8;
+    --red: #b03a2e;
+    --border: #e2ddd6;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(28,26,23,0.08);
+    --shadow-lg: 0 6px 28px rgba(28,26,23,0.12);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* TOP NAV */
+  .top-nav {
+    background: var(--ink);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: #fff; }
+
+  .back-link svg { opacity: 0.6; }
+
+  .nav-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 32px 32px;
+    text-align: center;
+  }
+
+  .hero .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .hero h1 {
+    font-family: 'Lora', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.25;
+  }
+
+  .hero .subtitle {
+    font-size: 15px;
+    color: var(--ink-light);
+    max-width: 580px;
+    margin: 0 auto 24px;
+    line-height: 1.65;
+  }
+
+  .instruction-box {
+    background: var(--gold-light);
+    border: 1px solid var(--gold-border);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  .instruction-box .i-title {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .instruction-box p {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.65;
+  }
+
+  .instruction-box p + p { margin-top: 8px; }
+
+  /* REMINDER CALLOUT */
+  .reminder {
+    background: var(--blue-light);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--blue);
+    font-style: italic;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 36px 20px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-num {
+    font-family: 'Lora', serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .section-meta {}
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .section-desc {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.5;
+  }
+
+  /* PHASE 1 — STRENGTHS */
+  .strengths-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .strength-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .strength-card:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-light), var(--shadow);
+  }
+
+  .strength-card .s-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+
+  .strength-card input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    padding: 0;
+  }
+
+  .strength-card input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+  .add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 9px 16px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    margin-top: 4px;
+  }
+
+  .add-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-light); }
+
+  /* DIVIDER */
+  .phase-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 36px 0;
+  }
+
+  .phase-divider .line { flex: 1; height: 1px; background: var(--border); }
+
+  .phase-divider .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 4px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--cream);
+    white-space: nowrap;
+  }
+
+  /* PHASE 2 — AFFIRMATIONS */
+  .affirmations-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--warm-white);
+    box-shadow: var(--shadow);
+  }
+
+  .affirmations-table thead tr {
+    background: var(--ink);
+  }
+
+  .affirmations-table thead th {
+    padding: 12px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .affirmations-table thead th:first-child { width: 38%; }
+
+  .aff-row {
+    border-top: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .aff-row:hover { background: #faf9f6; }
+
+  .aff-row td {
+    padding: 14px 18px;
+    vertical-align: top;
+  }
+
+  .strength-display {
+    font-size: 14px;
+    color: var(--ink-light);
+    font-style: italic;
+    line-height: 1.5;
+    min-height: 20px;
+  }
+
+  .strength-display.empty {
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+
+  .strength-tag {
+    display: inline-block;
+    background: var(--green-light);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 6px;
+  }
+
+  .aff-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--cream);
+    outline: none;
+    resize: vertical;
+    min-height: 60px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.5;
+  }
+
+  .aff-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px var(--green-light);
+    background: var(--warm-white);
+  }
+
+  .aff-input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+  .empty-state {
+    padding: 32px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  /* ACTIONS BAR */
+  .actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+    padding: 20px 24px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .actions-bar .a-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .actions-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--ink-light);
+  }
+  .btn-outline:hover { border-color: var(--ink-light); color: var(--ink); background: var(--cream); }
+
+  .btn-green {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+  .btn-green:hover { background: #2d6643; border-color: #2d6643; }
+
+  .btn-ink {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+  .btn-ink:hover { background: #333; }
+
+  /* PRINT */
+  @media print {
+    .top-nav, .actions-bar, .add-btn { display: none !important; }
+    body { background: #fff; }
+    .hero { border: none; }
+    .strength-card input, .aff-input { border: 1px solid #ccc !important; }
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 28px 16px 24px; }
+    .hero h1 { font-size: 24px; }
+    .main { padding: 24px 12px; }
+    .affirmations-table thead th:first-child { width: 40%; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a class="back-link" href="https://socialworky.craft.me/OSU" target="_blank">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to OSU Training Page
+  </a>
+  <span class="nav-label">MI Training · OSU</span>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Small Group Activity</div>
+  <h1>Mining for Affirmations</h1>
+  <p class="subtitle">Affirmations are more than compliments — they are observations of a client's genuine strengths, values, and efforts. This activity builds the habit of noticing what's already there.</p>
+  <div class="instruction-box">
+    <div class="i-title">Instructions</div>
+    <p><strong>Part 1:</strong> Think about a current or recent client. In the fields below, identify as many client strengths as you can observe — look for effort, values, resilience, insight, relationships, and past successes.</p>
+    <p><strong>Part 2:</strong> Once you've named your strengths, scroll down. Each strength will appear on the left. Practice converting it into a genuine affirmation — a "you" statement that reflects the strength back to the client in a meaningful way.</p>
+    <div class="reminder">Remember: Affirmations center the client and their strengths — not the clinician's reaction to them.</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- PART 1 -->
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <div class="section-meta">
+      <div class="section-title">Identify Client Strengths</div>
+      <div class="section-desc">What strengths, values, or efforts do you notice in this client?</div>
+    </div>
+  </div>
+
+  <div class="strengths-grid" id="strengthsGrid"></div>
+  <button class="add-btn" id="addStrengthBtn">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2V12M2 7H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Add another strength
+  </button>
+
+  <!-- DIVIDER -->
+  <div class="phase-divider">
+    <div class="line"></div>
+    <div class="pill">Now convert them ↓</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <div class="section-meta">
+      <div class="section-title">Craft the Affirmation</div>
+      <div class="section-desc">Each strength you identified appears on the left. Write an affirmation in the field on the right — a genuine, specific statement you could say directly to this client.</div>
+    </div>
+  </div>
+
+  <table class="affirmations-table">
+    <thead>
+      <tr>
+        <th>Strength you noticed</th>
+        <th>Your affirmation</th>
+      </tr>
+    </thead>
+    <tbody id="affirmationsBody">
+      <tr><td colspan="2" class="empty-state">Add strengths above to get started.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ACTIONS -->
+  <div class="actions-bar">
+    <span class="a-label">Save your work</span>
+    <div class="actions-group">
+      <button class="btn btn-outline" onclick="clearAll()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2L11 11M11 2L2 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Clear all
+      </button>
+      <button class="btn btn-outline" onclick="window.print()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="4" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V2H9V4M4 10H9V13H4V10Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Print
+      </button>
+      <button class="btn btn-outline" onclick="downloadText()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2V9M4 7L6.5 9.5L9 7M2 11H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download .txt
+      </button>
+      <button class="btn btn-green" onclick="copyToClipboard()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="7" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M2 9V2H9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Copy to clipboard
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const INITIAL_COUNT = 5;
+  let strengthCount = 0;
+
+  function getStrengths() {
+    const inputs = document.querySelectorAll('.strength-input');
+    return Array.from(inputs).map(i => i.value.trim());
+  }
+
+  function addStrengthField(focus = true) {
+    strengthCount++;
+    const grid = document.getElementById('strengthsGrid');
+    const card = document.createElement('div');
+    card.className = 'strength-card';
+    card.dataset.index = strengthCount;
+
+    const num = document.createElement('div');
+    num.className = 's-num';
+    num.textContent = 'Strength ' + strengthCount;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'strength-input';
+    input.placeholder = 'e.g. kept all three appointments this month';
+    input.addEventListener('input', updateAffirmationsTable);
+
+    card.appendChild(num);
+    card.appendChild(input);
+    grid.appendChild(card);
+
+    if (focus) input.focus();
+    updateAffirmationsTable();
+  }
+
+  function updateAffirmationsTable() {
+    const strengths = getStrengths();
+    const body = document.getElementById('affirmationsBody');
+    const existing = body.querySelectorAll('.aff-row');
+    const existingValues = {};
+    existing.forEach((row, i) => {
+      const ta = row.querySelector('.aff-input');
+      if (ta) existingValues[i] = ta.value;
+    });
+
+    body.innerHTML = '';
+
+    const filled = strengths.filter(s => s.length > 0);
+    if (filled.length === 0) {
+      body.innerHTML = '<tr><td colspan="2" class="empty-state">Add strengths above to get started.</td></tr>';
+      return;
+    }
+
+    let affIdx = 0;
+    strengths.forEach((s, i) => {
+      if (!s) return;
+      const tr = document.createElement('tr');
+      tr.className = 'aff-row';
+
+      const tdLeft = document.createElement('td');
+      const tag = document.createElement('span');
+      tag.className = 'strength-tag';
+      tag.textContent = 'Strength ' + (i + 1);
+      const display = document.createElement('div');
+      display.className = 'strength-display';
+      display.textContent = s;
+      tdLeft.appendChild(tag);
+      tdLeft.appendChild(display);
+
+      const tdRight = document.createElement('td');
+      const ta = document.createElement('textarea');
+      ta.className = 'aff-input';
+      ta.placeholder = 'Write your affirmation here…';
+      ta.value = existingValues[affIdx] || '';
+      tdRight.appendChild(ta);
+
+      tr.appendChild(tdLeft);
+      tr.appendChild(tdRight);
+      body.appendChild(tr);
+      affIdx++;
+    });
+  }
+
+  document.getElementById('addStrengthBtn').addEventListener('click', () => addStrengthField(true));
+
+  function clearAll() {
+    if (!confirm('Clear all strengths and affirmations?')) return;
+    document.querySelectorAll('.strength-input').forEach(i => { i.value = ''; });
+    document.querySelectorAll('.aff-input').forEach(t => { t.value = ''; });
+    updateAffirmationsTable();
+  }
+
+  function getTextContent() {
+    const strengths = getStrengths();
+    const affInputs = document.querySelectorAll('.aff-input');
+    let out = 'MINING FOR AFFIRMATIONS\nMI Training — OSU\n';
+    out += '='.repeat(40) + '\n\n';
+    out += 'PART 1 — STRENGTHS IDENTIFIED\n';
+    out += '-'.repeat(30) + '\n';
+    strengths.forEach((s, i) => {
+      if (s) out += (i + 1) + '. ' + s + '\n';
+    });
+    out += '\nPART 2 — AFFIRMATIONS\n';
+    out += '-'.repeat(30) + '\n';
+    let affIdx = 0;
+    strengths.forEach((s, i) => {
+      if (!s) return;
+      const aff = affInputs[affIdx] ? affInputs[affIdx].value.trim() : '';
+      out += '\nStrength ' + (i + 1) + ': ' + s + '\n';
+      out += 'Affirmation: ' + (aff || '[not yet written]') + '\n';
+      affIdx++;
+    });
+    return out;
+  }
+
+  function downloadText() {
+    const text = getTextContent();
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'affirmations-worksheet.txt';
+    a.click();
+  }
+
+  function copyToClipboard() {
+    const text = getTextContent();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.btn-green');
+      const orig = btn.innerHTML;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#1a7a4a';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+    });
+  }
+
+  // Initialize
+  for (let i = 0; i < INITIAL_COUNT; i++) addStrengthField(false);
+</script>
+</body>
+</html>
