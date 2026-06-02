@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intentional Reflections — MI Training</title>
+<style>
+  :root {
+    --ink: #1f2328;
+    --muted: #6b7280;
+    --muted-2: #9ca3af;
+    --bg: #ffffff;
+    --card: #ffffff;
+    --line: #e6e7eb;
+    --line-soft: #eef0f2;
+    --shell: #f7f8f9;
+
+    --amber-bg: #fdf8ec;
+    --amber-line: #f0e2bf;
+    --amber-text: #9a5a2a;
+
+    --blue-bg: #f1f7fd;
+    --blue-line: #d4e6f6;
+    --blue-text: #2f6db0;
+
+    --green: #2f8f5b;
+    --green-bg: #eaf6ee;
+    --green-line: #c7e7d2;
+
+    --rust: #b5531f;
+    --rust-bg: #fbeee5;
+
+    --radius: 16px;
+    --radius-sm: 10px;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--shell);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(1rem, 4vw, 2.5rem) 1rem 5rem;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.8rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.4rem 0.8rem 0.4rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .back-link:hover { color: var(--ink); border-color: var(--muted-2); }
+  .back-link svg { width: 14px; height: 14px; }
+
+  .toolbar { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .tool-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.42rem 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+  .tool-btn:hover { border-color: var(--muted-2); background: #fbfbfc; }
+  .tool-btn svg { width: 14px; height: 14px; }
+  .tool-btn.copied { color: var(--green); border-color: var(--green-line); background: var(--green-bg); }
+
+  /* Header */
+  .eyebrow {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted-2);
+    letter-spacing: 0.01em;
+    margin-bottom: 1.1rem;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 6vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 0.9rem;
+  }
+
+  .lede {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 60ch;
+  }
+
+  /* Callout boxes */
+  .box {
+    border-radius: var(--radius-sm);
+    padding: 1.05rem 1.2rem;
+    font-size: 0.98rem;
+  }
+
+  .box-amber {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-line);
+    color: var(--amber-text);
+    margin-top: 1.6rem;
+  }
+  .box-amber b { font-weight: 600; }
+  .box-amber ol { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+  .box-amber li { margin: 0.2rem 0; }
+
+  .box-blue {
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-line);
+    color: var(--blue-text);
+    margin-top: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* Section label */
+  .section-label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin: 2.6rem 0 1rem;
+  }
+  .section-label .lbl {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section-label .count {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--muted-2);
+  }
+
+  /* Statement item card */
+  .item {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.3rem 1.4rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+
+  .item-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    width: 1.6rem; height: 1.6rem;
+    flex: 0 0 auto;
+    border-radius: 7px;
+    background: var(--shell);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+  }
+
+  .item-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .toggle-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.32rem 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .toggle-btn:hover { color: var(--ink); border-color: var(--muted-2); }
+  .toggle-btn[aria-pressed="true"] {
+    color: var(--green);
+    border-color: var(--green-line);
+    background: var(--green-bg);
+  }
+
+  .statement-text {
+    font-size: 1.08rem;
+    line-height: 1.62;
+    color: var(--ink);
+    font-style: italic;
+    padding: 0.2rem 0 0.3rem;
+  }
+
+  .change, .sustain {
+    border-radius: 4px;
+    padding: 0.02em 0.1em;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .item.reveal .change {
+    background: var(--green-bg);
+    box-shadow: inset 0 -2px 0 var(--green);
+  }
+  .item.reveal .sustain {
+    background: var(--rust-bg);
+    box-shadow: inset 0 -2px 0 rgba(181, 83, 31, 0.45);
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+  }
+  .item.reveal .legend { max-height: 40px; opacity: 1; margin-top: 0.7rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .swatch { width: 0.8rem; height: 0.8rem; border-radius: 3px; }
+  .swatch.c { background: var(--green); }
+  .swatch.s { background: rgba(181, 83, 31, 0.55); }
+
+  .field-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 1.1rem 0 0.45rem;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 84px;
+    resize: vertical;
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.7rem 0.85rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  textarea::placeholder { color: var(--muted-2); font-style: italic; }
+  textarea:focus {
+    outline: none;
+    border-color: var(--blue-text);
+    box-shadow: 0 0 0 3px rgba(47, 109, 176, 0.12);
+  }
+
+  /* Footer export */
+  .export-footer {
+    margin-top: 2rem;
+    padding: 1.3rem 1.4rem;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .export-footer .ef-text { font-size: 0.92rem; color: var(--muted); flex: 1 1 220px; }
+  .export-footer .ef-text b { color: var(--ink); font-weight: 600; }
+
+  .closing {
+    margin-top: 1.6rem;
+    font-size: 0.9rem;
+    color: var(--muted-2);
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.4rem;
+    transform: translateX(-50%) translateY(140%);
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.88rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    transition: transform 0.32s cubic-bezier(.2,.9,.3,1.2);
+    z-index: 50;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Print */
+  @media print {
+    body { background: #fff; padding: 0.5in; }
+    .topbar, .toggle-btn, .export-footer, .toast, .legend { display: none !important; }
+    .item, .box-amber, .box-blue {
+      box-shadow: none;
+      break-inside: avoid;
+      border-color: #ccc;
+    }
+    .item.reveal .change, .item.reveal .sustain { background: transparent; box-shadow: none; }
+    textarea {
+      border: none;
+      border-bottom: 1px solid #bbb;
+      border-radius: 0;
+      min-height: auto;
+      padding: 0.2rem 0;
+    }
+    h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <!-- REPLACE the href below with your Craft hub URL -->
+    <a class="back-link" id="backLink" href="https://CRAFT-HUB-URL-HERE">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to OSU Training
+    </a>
+    <div class="toolbar">
+      <button class="tool-btn" id="copyBtn" type="button" aria-label="Copy your group's work">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy
+      </button>
+      <button class="tool-btn" id="downloadBtn" type="button" aria-label="Download your group's work">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Download
+      </button>
+      <button class="tool-btn" id="printBtn" type="button" aria-label="Print your group's work">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+        Print
+      </button>
+    </div>
+  </div>
+
+  <div class="eyebrow">Activity 8 &middot; Intentional Reflections</div>
+  <h1>Intentional Reflections</h1>
+  <p class="lede">Every statement below mixes sustain talk with change talk. As a group, find the change talk and craft a reflection that highlights or deepens it.</p>
+
+  <div class="box box-amber">
+    <b>Instructions:</b>
+    <ol>
+      <li>Have one member read the statement aloud.</li>
+      <li>Work together to identify the change talk.</li>
+      <li>Develop a reflection that highlights or deepens that change talk.</li>
+      <li>Read the statement again while another member responds with your reflection.</li>
+      <li>Rotate roles and move to the next statement.</li>
+    </ol>
+  </div>
+
+  <div class="box box-blue">Remember: a reflection is a statement, not a question. If your group gets stuck on the change talk, tap &ldquo;Show change talk&rdquo; on that statement.</div>
+
+  <div class="section-label">
+    <span class="lbl">Statements</span>
+    <span class="count">5 items</span>
+  </div>
+
+  <div id="items"></div>
+
+  <div class="export-footer">
+    <div class="ef-text"><b>Capture your work.</b> Copy it to paste elsewhere, download a text file, or print a clean copy for the debrief.</div>
+    <div class="toolbar">
+      <button class="tool-btn" id="copyBtn2" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy
+      </button>
+      <button class="tool-btn" id="downloadBtn2" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Download
+      </button>
+      <button class="tool-btn" id="printBtn2" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+        Print
+      </button>
+    </div>
+  </div>
+
+  <p class="closing">Return to the main room when you finish, or when you are called back.</p>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+  const statements = [
+    [
+      {t: "I know my drinking has caused some problems, ", k: "change"},
+      {t: "but it's also the only way I can unwind and forget about my stress for a while. ", k: "sustain"},
+      {t: "Maybe I should cut back a bit, ", k: "change"},
+      {t: "but it's hard to imagine life without it.", k: "sustain"}
+    ],
+    [
+      {t: "I've been using for a long time, and yeah, I guess it has led to some bad situations. ", k: "change"},
+      {t: "Still, it gives me this sense of confidence and connection with others that I've never felt before.", k: "sustain"}
+    ],
+    [
+      {t: "Sure, I've seen media scare tactics about heroin on the news and Facebook. ", k: "sustain"},
+      {t: "I guess it has its risks, ", k: "change"},
+      {t: "but I've been using it for a long time and I'm still fine. Everyone always obsesses on the worst case scenario where people are OD'ing. I can manage my use, and I'm not causing any harm to others, so why should I change?", k: "sustain"}
+    ],
+    [
+      {t: "Part of me knows I should quit, ", k: "change"},
+      {t: "but it's like an old friend that I can't seem to let go of. ", k: "sustain"},
+      {t: "I've had moments when I thought about seeking help, ", k: "change"},
+      {t: "but then fear creeps in, and I worry about failing or feeling even worse without it.", k: "sustain"}
+    ],
+    [
+      {t: "I've been using Percocet on and off since the car accident last year. My doctor cut me off, but I can usually find more. ", k: "sustain"},
+      {t: "I guess it might be harmful in the long run, ", k: "change"},
+      {t: "but right now, it's the only thing that gives me a sense of relief and escape from my problems. Life can be so overwhelming, and it helps me forget about everything for a little while.", k: "sustain"}
+    ]
+  ];
+
+  const plain = segs => '\u201c' + segs.map(s => s.t).join('') + '\u201d';
+
+  const itemsWrap = document.getElementById('items');
+
+  statements.forEach((segs, i) => {
+    const item = document.createElement('div');
+    item.className = 'item';
+
+    const inner = segs.map(s => {
+      if (s.k === 'change') return '<span class="change">' + s.t + '</span>';
+      if (s.k === 'sustain') return '<span class="sustain">' + s.t + '</span>';
+      return s.t;
+    }).join('');
+
+    item.innerHTML =
+      '<div class="item-head">' +
+        '<span class="badge">' + (i + 1) + '</span>' +
+        '<span class="item-title">Statement ' + (i + 1) + '</span>' +
+        '<button class="toggle-btn" type="button" aria-pressed="false" data-i="' + i + '">' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>' +
+          'Show change talk' +
+        '</button>' +
+      '</div>' +
+      '<p class="statement-text">\u201c' + inner + '\u201d</p>' +
+      '<div class="legend">' +
+        '<span><span class="swatch c"></span> Change talk</span>' +
+        '<span><span class="swatch s"></span> Sustain talk</span>' +
+      '</div>' +
+      '<label class="field-label" for="r' + i + '">Your group&rsquo;s reflection</label>' +
+      '<textarea id="r' + i + '" placeholder="It sounds like\u2026"></textarea>';
+
+    itemsWrap.appendChild(item);
+  });
+
+  // Toggle highlights
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.item');
+      const on = item.classList.toggle('reveal');
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.lastChild.textContent = on ? 'Hide change talk' : 'Show change talk';
+    });
+  });
+
+  // Build export text
+  function buildText() {
+    const lines = [];
+    lines.push('Intentional Reflections \u2014 MI & SBIRT Training');
+    lines.push(new Date().toLocaleDateString());
+    lines.push('');
+    statements.forEach((segs, i) => {
+      lines.push('Statement ' + (i + 1) + ':');
+      lines.push(plain(segs));
+      const r = (document.getElementById('r' + i).value || '').trim();
+      lines.push('Our reflection: ' + (r || '(left blank)'));
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
+
+  // Toast
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+  }
+
+  // Copy
+  function doCopy(btn) {
+    const text = buildText();
+    const done = () => {
+      showToast('Copied to clipboard');
+      if (btn) {
+        const orig = btn.lastChild.textContent;
+        btn.classList.add('copied');
+        btn.lastChild.textContent = 'Copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.lastChild.textContent = orig; }, 1600);
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { showToast('Copy not supported \u2014 use Download'); }
+    document.body.removeChild(ta);
+  }
+
+  // Download
+  function doDownload() {
+    const blob = new Blob([buildText()], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'intentional-reflections.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Download started');
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', e => doCopy(e.currentTarget));
+  document.getElementById('copyBtn2').addEventListener('click', e => doCopy(e.currentTarget));
+  document.getElementById('downloadBtn').addEventListener('click', doDownload);
+  document.getElementById('downloadBtn2').addEventListener('click', doDownload);
+  document.getElementById('printBtn').addEventListener('click', () => window.print());
+  document.getElementById('printBtn2').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
